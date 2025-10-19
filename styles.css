@@ -13,7 +13,7 @@
   --max-width:     1000px;
   --container-padding: 20px;
   --radius: 8px;
-  --font-sans: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-sans: "Avenir", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 /* Global resets and typography */

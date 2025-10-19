@@ -7,9 +7,9 @@
   <style>
     /* ====== Brand Tokens (easy to tweak) ====== */
     :root{
-      --brand-blue: #0f3d66;       /* headline / buttons */
-      --brand-yellow: #ffd100;     /* jerrycan accent */
-      --ink: #0c1a24;              /* body text */
+      --brand-blue: #003366;       /* headline / buttons */
+      --brand-yellow: #ffc907;     /* jerrycan accent */
+      --ink: #1a1a1a;              /* body text */
       --ink-light: #e8f0f6;        /* subtle text on dark */
       --bg: #ffffff;
       --maxw: 1100px;
@@ -24,7 +24,7 @@
 
     /* ====== Base ====== */
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+    html,body{margin:0;background:#003366;color:var(--ink);font-family:'Avenir', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;line-height:1.5;height:100%}
     img{max-width:100%;display:block}
     a{color:inherit;text-decoration:none}
     .container{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--space-2)}
@@ -43,32 +43,57 @@
       display:flex; align-items:center; gap:.6rem; font-weight:700; letter-spacing:.5px;
       color:#fff;
     }
-    .logo-mark{
-      width:26px;height:34px;border-radius:4px;background:var(--brand-yellow);
-      box-shadow: inset 0 -4px 0 rgba(0,0,0,.15);
-    }
+
+    /* Donate button in header - positioned top-right and recolored */
     .nav a.cta-mini{
-      background:#fff;color:var(--brand-blue);padding:.55rem .9rem;border-radius:999px;font-weight:700;
+      background:#003366; /* button background */
+      color:#e8f0f6; /* light text */
+      padding:.55rem .9rem;border-radius:999px;font-weight:700; text-decoration:none;
+      box-shadow: 0 6px 18px rgba(0,0,0,.15);
+      position:relative; z-index:4;
     }
+    /* On larger screens, make the donate button sit at the far right of the header */
+    @media (min-width:740px){
+      header .nav a.cta-mini{ position: absolute; right: 1rem; top: 1rem; }
+      header .nav{ padding-right:5.5rem; }
+    }
+    .nav a.cta-mini:hover{ transform: translateY(-1px); opacity:.98 }
 
     /* ====== Hero ====== */
     .hero{
-      position:relative; min-height:88vh; display:grid; align-items:end; color:#fff;
-      background:
-        linear-gradient( to right, rgba(15,61,102,.85) 0%, rgba(15,61,102,.55) 45%, rgba(15,61,102,.15) 70% ),
-        url("https://images.unsplash.com/photo-1521459467264-802e2ef3141a?q=80&w=1600&auto=format&fit=crop") center/cover no-repeat;
-      /* TODO: Replace with your hero image */
+      position:relative; min-height:100vh; display:grid; align-items:end; color:#fff;
+      /* background image sits on the element itself so it renders immediately */
+      background: url("img/0.jpg") center/cover no-repeat;
     }
+    /* overlay moved to a pseudo-element so it can fade in separately from the image */
+    .hero::before{
+      content: ""; position:absolute; inset:0; z-index:1;
+      background: linear-gradient( to right, rgba(0,51,102,.45) 0%, rgba(0,51,102,.28) 45%, rgba(0,51,102,.075) 70% );
+      opacity:0; transition: opacity 900ms ease 300ms;
+      pointer-events:none;
+    }
+
     .hero__panel{
-      max-width:720px; padding: clamp(1.25rem, 5vw, 3rem);
-      margin: 25vh var(--space-2) var(--space-4); border-radius: var(--radius);
-      background: rgba(255,255,255,.06); backdrop-filter: blur(2px);
-      box-shadow: 0 1px 0 rgba(255,255,255,.08) inset;
+      /* tighter panel to avoid covering faces */
+      display: inline-block;
+      width: auto; max-width: 420px; padding: clamp(.6rem, 3vw, 1.2rem);
+      /* move higher so it doesn't sit over faces */
+      justify-self: start;
+      margin: 18vh 1rem var(--space-4) 1rem; border-radius: calc(var(--radius) - 4px);
+      background: rgba(255,255,255,.03); backdrop-filter: blur(1.5px);
+      box-shadow: 0 1px 0 rgba(255,255,255,.04) inset;
+      position: relative; z-index: 2;
+      font-size: .98rem;
+      /* start hidden and slide up slightly, then appear when the page finishes loading */
+      opacity:0; transform: translateY(6px); transition: opacity 700ms ease, transform 700ms ease;
     }
-    .eyebrow{
-      font-size:.85rem; text-transform:uppercase; letter-spacing:.12em;
-      color: #dff0ff; opacity:.9; margin-bottom:.25rem;
+
+    /* Mobile: ensure the panel doesn't overlap important parts of the image */
+    @media (max-width:700px){
+      .hero{ min-height:60vh }
+      .hero__panel{ max-width: 92%; margin: 12vh .8rem 1.25rem .8rem; padding: .8rem; }
     }
+
     .hero h1{
       margin:0 0 .6rem; font-weight:800; line-height:1.1;
       font-size: clamp(2rem, 6.2vw, 3.6rem);
@@ -143,6 +168,13 @@
     .footer-grid{ display:grid; gap:var(--space-2); grid-template-columns: 1fr; }
     .brandline{ display:flex; align-items:center; gap:.6rem; color:var(--brand-blue); font-weight:800 }
 
+    /* Header and UI fade rules - start hidden then fade in when body.has class */
+    header{ opacity:0; transform: translateY(6px); transition: opacity 700ms ease, transform 700ms ease; }
+    body.is-loaded header{ opacity:1; transform: translateY(0); }
+    body.is-loaded .hero__panel{ opacity:1; transform: translateY(0); }
+    /* Fade in overlay slightly after other UI for a pleasing effect */
+    body.is-loaded .hero::before{ opacity:1 }
+
     /* ====== Responsive ====== */
     @media (min-width: 740px){
       .grid{ grid-template-columns: repeat(3,1fr) }
@@ -157,8 +189,7 @@
   <header>
     <nav class="nav container" aria-label="Primary">
       <a class="logo" href="#">
-        <span class="logo-mark" aria-hidden="true"></span>
-        <span>charity: water</span>
+        <img src="img/charitywater_logo_horizontal_WhiteText.png" alt="charity: water logo" style="height:34px; display:block;" />
       </a>
       <a class="cta-mini" href="#donate">Donate</a>
     </nav>
@@ -167,7 +198,6 @@
   <!-- ====== Hero ====== -->
   <section class="hero" role="banner" aria-label="Give Clean Water">
     <div class="hero__panel">
-      <p class="eyebrow">Clean water changes everything</p>
       <h1>Give Clean Water. <br/>Know Your Impact.</h1>
       <p>With charity: water, <strong>100% of your donation funds real water projects</strong> you can track — transparent, fast, and meaningful, even with just $10.</p>
       <a class="cta" id="donate" href="#how">Sponsor a project</a>
@@ -175,83 +205,14 @@
     </div>
   </section>
 
-  <!-- ====== Trust strip (100% model) ====== -->
-  <section class="trust" aria-label="Transparency">
-    <div class="wrap">
-      <div class="can" aria-hidden="true"></div>
-      <p><strong>100% Model:</strong> public donations go to projects — <em>operations are funded separately</em> for total transparency.</p>
-    </div>
-  </section>
+  <!-- Small script to trigger fade-in of overlay and UI once the page finishes loading -->
+  <script>
+    // When the window finishes loading, add a class to the body to trigger CSS transitions.
+    // We wait for load (not DOMContentLoaded) so images have started to render.
+    window.addEventListener('load', function () {
+      document.body.classList.add('is-loaded');
+    });
+  </script>
 
-  <!-- ====== How it works ====== -->
-  <main>
-    <section class="how container" id="how" aria-label="How your gift works">
-      <h2>How your gift becomes clean, safe water</h2>
-      <div class="grid">
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1532635224-4781b9c2a2f4?q=80&w=1200&auto=format&fit=crop" alt="Person using a phone to donate" />
-          <!-- TODO: replace placeholder image -->
-          <div class="step">01 · Give in seconds</div>
-          <p>Mobile-first, low-friction giving — set an amount (even $10) and you’re done.</p>
-        </article>
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=1200&auto=format&fit=crop" alt="Community water tap running" />
-          <div class="step">02 · 100% to the field</div>
-          <p>Your donation funds wells, filters, and clean water systems in communities that need them most.</p>
-        </article>
-        <article class="card">
-          <img src="https://images.unsplash.com/photo-1509099395498-a9eb83d02d1a?q=80&w=1200&auto=format&fit=crop" alt="Map pins on a project map" />
-          <div class="step">03 · Track your impact</div>
-          <p>Get updates, GPS coordinates, and photos so you can see exactly where your gift goes.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- ====== Impact counters (static placeholders) ====== -->
-    <section class="impact" aria-label="Impact">
-      <div class="container">
-        <h2>Transparency you can see</h2>
-        <div class="kpis">
-          <div>
-            <div class="num">100%</div>
-            <div class="label">of public donations to projects</div>
-          </div>
-          <div>
-            <div class="num">GPS-tracked</div>
-            <div class="label">project locations</div>
-          </div>
-          <div>
-            <div class="num">$10</div>
-            <div class="label">can help change a life</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ====== Footer ====== -->
-  <footer class="container" role="contentinfo">
-    <div class="footer-grid">
-      <div>
-        <div class="brandline"><span class="logo-mark" aria-hidden="true" style="width:20px;height:26px"></span> charity: water</div>
-        <p style="margin-top:.5rem">We bring clean and safe drinking water to people in need. Replace this text with your official boilerplate or mission snippet.</p>
-      </div>
-      <div>
-        <p><strong>Quick links</strong></p>
-        <p><a href="#how">How it works</a><br>
-           <a href="#donate">Sponsor a project</a><br>
-           <a href="#">Why water?</a></p>
-      </div>
-    </div>
-    <p style="margin-top:var(--space-3); font-size:.9rem; color:#7a8c9a">© charity: water. For demo purposes only.</p>
-  </footer>
-
-  <!-- ====== Notes for you ======
-    TODOs:
-     • Replace hero background URL (in CSS .hero) with your image.
-     • Replace the three "How it works" images with your own assets.
-     • Point all links (Donate, Why water?) to your real routes.
-     • Edit copy to match your final brand guidelines.
-  ================================= -->
 </body>
 </html>
